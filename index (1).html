@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 6 Mathematics — Competition Quiz with Instant Explanations</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════
+   TOKENS (enhanced for instant explanation)
+══════════════════════════════════════════════════ */
+:root {
+  --ink:      #0d0a1e;
+  --glass:    rgba(255,255,255,0.06);
+  --glass-b:  rgba(255,255,255,0.12);
+  --glass-s:  rgba(255,255,255,0.18);
+  --rim:      rgba(255,255,255,0.14);
+  --rim2:     rgba(255,255,255,0.22);
+  --white:    #f0eeff;
+  --white2:   rgba(240,238,255,0.7);
+  --white3:   rgba(240,238,255,0.45);
+  --white4:   rgba(240,238,255,0.25);
+
+  --a1: #6366f1; --a2: #8b5cf6; --a3: #06b6d4; --a4: #10b981; --a5: #f59e0b; --a6: #ec4899; --a7: #3b82f6;
+  --t0:#fbbf24; --t1:#34d399; --t2:#a78bfa; --t3:#f87171; --t4:#38bdf8; --t5:#fb923c; --t6:#4ade80; --t7:#f472b6;
+  --correct: #34d399;
+  --wrong:   #f87171;
+  --explain-bg: rgba(13,10,30,0.85);
+
+  --mono: 'DM Mono', monospace;
+  --body: 'DM Sans', sans-serif;
+  --disp: 'Fraunces', serif;
+  --radius: 20px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--body);
+  background: var(--ink);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* canvas & floating symbols (same as before) */
+#bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.math-symbol { position: fixed; font-family: var(--disp); font-weight: 300; color: rgba(255,255,255,0.04); pointer-events: none; z-index: 0; animation: drift linear infinite; user-select: none; }
+@keyframes drift { from { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } to { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
+body::after { content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.025; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 256px; }
+
+/* screens */
+#cover, #quiz, #result { position: relative; z-index: 2; }
+#cover { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 20px; animation: riseIn .8s cubic-bezier(.22,1,.36,1) both; }
+@keyframes riseIn { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+.cover-card { width: 100%; max-width: 740px; background: var(--glass); backdrop-filter: blur(40px) saturate(1.8); border: 1px solid var(--rim); border-radius: 32px; padding: 60px 56px; box-shadow: 0 0 0 1px rgba(255,255,255,0.04) inset, 0 40px 80px rgba(0,0,0,0.5), 0 0 120px rgba(99,102,241,0.15); position: relative; overflow: hidden; }
+.cover-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--a6) 0%, var(--a1) 20%, var(--a3) 40%, var(--a4) 60%, var(--a5) 80%, var(--a6) 100%); border-radius: 32px 32px 0 0; }
+.cover-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: rgba(167,139,250,0.9); margin-bottom: 24px; }
+.cover-eyebrow::before { content: ''; width: 24px; height: 1px; background: rgba(167,139,250,0.6); }
+.cover-title { font-family: var(--disp); font-weight: 900; font-size: clamp(36px, 7vw, 68px); line-height: 0.95; margin-bottom: 20px; letter-spacing: -2px; }
+.cover-title .line1 { background: linear-gradient(135deg, #e0d7ff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: block; }
+.cover-title .line2 { background: linear-gradient(135deg, #67e8f9, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: block; font-style: italic; font-weight: 300; font-size: .7em; margin-top: 4px; }
+.cover-desc { font-size: 15px; color: var(--white3); line-height: 1.75; margin-bottom: 36px; font-weight: 300; }
+.topic-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 36px; }
+.tchiip { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--glass); border: 1px solid var(--rim); border-radius: 12px; font-size: 12px; font-weight: 500; color: var(--white2); transition: all .2s; }
+.tchiip:hover { background: var(--glass-b); border-color: var(--rim2); transform: translateY(-2px); }
+.tchiip-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.stats-row { display: flex; gap: 12px; margin-bottom: 40px; flex-wrap: wrap; }
+.cstat { flex: 1; min-width: 100px; background: var(--glass); border: 1px solid var(--rim); border-radius: 14px; padding: 16px 14px; text-align: center; }
+.cstat-val { font-family: var(--mono); font-size: 30px; font-weight: 500; background: linear-gradient(135deg, var(--white), var(--white3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.btn-begin { width: 100%; padding: 20px; border-radius: 16px; font-weight: 700; background: linear-gradient(135deg, #6366f1, #8b5cf6, #06b6d4); background-size: 200% 200%; color: #fff; box-shadow: 0 8px 40px rgba(99,102,241,0.45); animation: gradShift 4s ease infinite; transition: transform .2s; display: flex; align-items: center; justify-content: center; gap: 12px; }
+.btn-begin:hover { transform: translateY(-3px); }
+@keyframes gradShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+/* quiz shell */
+#quiz { display: none; flex-direction: column; min-height: 100vh; }
+.topbar { position: sticky; top: 0; z-index: 100; height: 64px; background: rgba(13,10,30,0.75); backdrop-filter: blur(24px); border-bottom: 1px solid var(--rim); display: flex; align-items: center; gap: 20px; padding: 0 28px; }
+.tb-logo { font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 2px; color: var(--a2); }
+.tb-progress { flex: 1; max-width: 380px; }
+.tb-prog-row { display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; text-transform: uppercase; color: var(--white4); margin-bottom: 6px; }
+.progbar { height: 3px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; }
+.progfill { height: 100%; background: linear-gradient(90deg, var(--a1), var(--a3), var(--a4)); border-radius: 10px; transition: width .5s cubic-bezier(.22,1,.36,1); }
+.tb-pill { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--white3); background: var(--glass); border: 1px solid var(--rim); border-radius: 50px; padding: 6px 16px; white-space: nowrap; }
+
+.quiz-layout { display: flex; flex: 1; }
+.sidebar { width: 256px; min-width: 240px; background: rgba(13,10,30,0.6); backdrop-filter: blur(20px); border-right: 1px solid var(--rim); padding: 24px 18px; overflow-y: auto; position: sticky; top: 64px; height: calc(100vh - 64px); }
+.sb-section-title { font-size: 9px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--white4); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; }
+.q-number-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 22px; }
+.qnbtn { aspect-ratio: 1; border-radius: 8px; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--white4); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: all .15s; }
+.qnbtn.qn-cur { background: linear-gradient(135deg, var(--a1), var(--a2)); border-color: transparent; color: #fff; box-shadow: 0 2px 12px rgba(99,102,241,0.4); }
+.qnbtn.qn-done { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.35); color: var(--correct); }
+.legend { display: flex; flex-direction: column; gap: 7px; margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.leg-row { display: flex; align-items: center; gap: 9px; font-size: 11px; color: var(--white4); }
+.leg-sw { width: 14px; height: 14px; border-radius: 5px; }
+.lsw-cur { background: linear-gradient(135deg,var(--a1),var(--a2)); }
+.lsw-done { background: rgba(52,211,153,0.2); border: 1px solid rgba(52,211,153,0.4); }
+.lsw-empty { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+
+/* MAIN QUIZ AREA with instant explanation panel */
+.quiz-main { flex: 1; padding: 36px 44px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+.q-topic-banner { display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px; border-radius: 50px; border: 1px solid; font-size: 11px; font-weight: 600; text-transform: uppercase; width: fit-content; }
+.q-card { background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--rim); border-radius: var(--radius); overflow: hidden; transition: box-shadow .3s; }
+.qcard-top { padding: 22px 28px 18px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 18px; }
+.qnum-badge { width: 56px; height: 56px; min-width: 56px; border-radius: 14px; font-family: var(--mono); font-size: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center; position: relative; }
+.qcard-meta { flex: 1; }
+.qmeta-num { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--white4); margin-bottom: 4px; }
+.qmeta-topic { font-size: 15px; font-weight: 600; color: var(--white2); }
+.qcard-body { padding: 28px 28px 30px; }
+.q-text { font-size: clamp(15px, 1.8vw, 18px); line-height: 1.7; color: var(--white); margin-bottom: 26px; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.opt { display: flex; align-items: center; gap: 14px; padding: 15px 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 13px; font-size: 15px; color: var(--white2); cursor: pointer; transition: all .18s; text-align: left; width: 100%; }
+.opt:hover { background: rgba(255,255,255,0.09); border-color: var(--rim2); transform: translateX(5px); color: var(--white); }
+.opt-ltr { width: 36px; height: 36px; min-width: 36px; border-radius: 9px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); font-family: var(--mono); font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; color: var(--white3); transition: all .18s; }
+.opt.sel .opt-ltr { background: linear-gradient(135deg, var(--a1), var(--a2)); border-color: transparent; color: #fff; }
+
+/* ---- INSTANT EXPLANATION PANEL (new) ---- */
+.instant-explain {
+  margin-top: 20px;
+  padding: 18px 22px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
+  border-radius: 18px;
+  border-left: 4px solid var(--correct);
+  font-size: 14px;
+  line-height: 1.55;
+  transition: all 0.2s ease;
+  animation: fadeSlideUp 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.instant-explain.correct {
+  border-left-color: var(--correct);
+  background: rgba(52,211,153,0.08);
+}
+.instant-explain.wrong {
+  border-left-color: var(--wrong);
+  background: rgba(248,113,113,0.06);
+}
+.explain-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.explain-header svg { width: 18px; height: 18px; }
+.instant-explain .explain-text {
+  color: var(--white2);
+  font-weight: 400;
+}
+.instant-explain .correct-answer-highlight {
+  color: var(--correct);
+  font-family: var(--mono);
+  font-weight: 500;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.nav-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.nav-right { display: flex; gap: 12px; align-items: center; }
+.btn-nav { display: inline-flex; align-items: center; gap: 8px; padding: 13px 26px; border-radius: 12px; font-size: 14px; font-weight: 600; border: 1px solid var(--rim); color: var(--white3); background: var(--glass); transition: all .18s; }
+.btn-nav:hover:not(:disabled) { border-color: var(--rim2); color: var(--white); background: var(--glass-b); transform: translateY(-1px); }
+.btn-nav:disabled { opacity: .2; cursor: not-allowed; }
+.btn-next-q { background: rgba(6,182,212,0.18); border-color: rgba(6,182,212,0.4); color: #67e8f9; }
+.btn-submit-q { background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3)); border-color: rgba(139,92,246,0.5); color: #c4b5fd; font-weight: 700; }
+
+/* result screen (unchanged but retains style) */
+#result { display: none; min-height: 100vh; padding: 48px 24px; animation: riseIn .6s both; }
+.result-inner { max-width: 1000px; margin: 0 auto; }
+.res-hero, .res-card, .sheet-card { background: var(--glass); backdrop-filter: blur(24px); border: 1px solid var(--rim); border-radius: 28px; margin-bottom: 24px; padding: 32px 28px; }
+.res-score { font-family: var(--disp); font-weight: 900; font-size: clamp(72px, 16vw, 120px); background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+/* responsive */
+@media (max-width: 900px) { .sidebar { display: none; } .quiz-main { padding: 20px 18px; } }
+@media (max-width: 600px) { .cover-card { padding: 36px 24px; } }
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div id="mathSymbols"></div>
+<!-- COVER -->
+<div id="cover">
+  <div class="cover-card">
+    <div class="cover-eyebrow">International Competition Series</div>
+    <h1 class="cover-title"><span class="line1">Grade 6 Mathematics</span><span class="line2">Competition Quiz</span></h1>
+    <p class="cover-desc">40 competition-calibre questions across 8 topics. Tap any answer — get instant expert explanation right away. Then review and submit for full performance report.</p>
+    <div class="topic-grid"><div class="tchiip"><span class="tchiip-dot" style="background:var(--t0)"></span>Speed, Distance &amp; Time</div><div class="tchiip"><span class="tchiip-dot" style="background:var(--t1)"></span>Weight</div><div class="tchiip"><span class="tchiip-dot" style="background:var(--t2)"></span>Volume of a Sphere</div><div class="tchiip"><span class="tchiip-dot" style="background:var(--t3)"></span>Volume: Cube &amp; Cuboid</div><div class="tchiip"><span class="tchiip-dot" style="background:var(--t4)"></span>Length</div><div class="tchiip"><span class="tchiip-dot" style="background:var(--t5)"></span>Angles</div><div class="tchiip"><span class="tchiip-dot" style="background:var(--t6)"></span>Central Tendency</div><div class="tchiip"><span class="tchiip-dot" style="background:var(--t7)"></span>Capacity</div></div>
+    <div class="stats-row"><div class="cstat"><div class="cstat-val">40</div><div class="cstat-key">Questions</div></div><div class="cstat"><div class="cstat-val">8</div><div class="cstat-key">Topics</div></div><div class="cstat"><div class="cstat-val">A–D</div><div class="cstat-key">Options</div></div><div class="cstat"><div class="cstat-val">✨</div><div class="cstat-key">Instant Explain</div></div></div>
+    <button class="btn-begin" onclick="startQuiz()"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14v14l11-7-11-7z"/></svg>Begin Quiz</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz">
+  <div class="topbar"><div class="tb-logo">G6 · MATH</div><div class="tb-progress"><div class="tb-prog-row"><span>Progress</span><span id="progLabel">Q1 of 40</span></div><div class="progbar"><div class="progfill" id="progFill" style="width:2.5%"></div></div></div><div class="tb-pill" id="tbPill">Answered: 0 / 40</div></div>
+  <div class="quiz-layout">
+    <div class="sidebar"><div class="sb-section-title">Questions <span id="sbCount">0/40</span></div><div class="q-number-grid" id="qGrid"></div><div class="legend"><div class="leg-row"><div class="leg-sw lsw-cur"></div>Current</div><div class="leg-row"><div class="leg-sw lsw-done"></div>Answered</div><div class="leg-row"><div class="leg-sw lsw-empty"></div>Not answered</div></div><div class="sb-section-title">Topics</div><div class="sb-topics-list"><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t0)"></div>Q1–5: Speed, D&amp;T</div><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t1)"></div>Q6–10: Weight</div><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t2)"></div>Q11–15: Sphere Vol</div><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t3)"></div>Q16–20: Cube/Cuboid</div><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t4)"></div>Q21–25: Length</div><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t5)"></div>Q26–30: Angles</div><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t6)"></div>Q31–35: Central Tend.</div><div class="sb-t-row"><div class="sb-t-dot" style="background:var(--t7)"></div>Q36–40: Capacity</div></div></div>
+    <div class="quiz-main" id="quizMain">
+      <div id="topicBanner" class="q-topic-banner"></div>
+      <div class="q-card">
+        <div class="qcard-top"><div class="qnum-badge" id="qNumBadge">1</div><div class="qcard-meta"><div class="qmeta-num" id="qMetaNum">Question 1 of 40</div><div class="qmeta-topic" id="qMetaTopic">—</div></div></div>
+        <div class="qcard-body">
+          <p class="q-text" id="qText"></p>
+          <div class="options" id="optsContainer"></div>
+          <div id="instantExplainPanel" class="instant-explain" style="display: none;"></div>
+        </div>
+      </div>
+      <div class="nav-row"><button class="btn-nav" id="btnPrev" onclick="navigate(-1)">◀ Previous</button><div class="nav-right"><button class="btn-nav btn-next-q" id="btnNext" onclick="navigate(1)">Next ▶</button><button class="btn-nav btn-submit-q" id="btnSubmit" style="display:none" onclick="submitQuiz()">✦ Submit Quiz</button></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT (full summary) -->
+<div id="result"><div class="result-inner"><div class="res-hero"><span class="res-icon" id="resIcon">🏆</span><div class="res-score" id="resScore">0</div><div class="res-denom">out of 40</div><div class="res-title" id="resTitle">Quiz Complete!</div><div class="res-grade" id="resGrade">—</div><div class="res-stats"><div class="res-stat"><div class="rs-val" id="rsC" style="color:var(--correct)">0</div><div class="rs-key">Correct</div></div><div class="res-stat"><div class="rs-val" id="rsW" style="color:var(--wrong)">0</div><div class="rs-key">Wrong</div></div><div class="res-stat"><div class="rs-val" id="rsS" style="color:var(--white4)">0</div><div class="rs-key">Skipped</div></div><div class="res-stat"><div class="rs-val" id="rsP" style="color:var(--a5)">0%</div><div class="rs-key">Score %</div></div></div></div><div class="res-card"><div class="res-card-title">⬡ Performance by Topic</div><div id="topicBreakdown"></div></div><div class="sheet-card"><div class="sheet-hd">⊞ Detailed Score Sheet</div><div class="sheet-scroll"><table><thead><tr><th>#</th><th>Topic</th><th>Question</th><th>Your Answer</th><th>Status</th></tr></thead><tbody id="sheetTbody"></tbody></table></div></div><div class="retry-wrap"><button class="btn-retry" onclick="retryQuiz()">⟳ &nbsp;Try Again</button></div></div></div>
+
+<script>
+/* ———— QUIZ DATA ———— */
+const TOPICS = [{ name:"Speed, Distance & Time", color:"#fbbf24", r:[0,4]},{ name:"Weight", color:"#34d399", r:[5,9]},{ name:"Volume of a Sphere", color:"#a78bfa", r:[10,14]},{ name:"Volume: Cube & Cuboid", color:"#f87171", r:[15,19]},{ name:"Length", color:"#38bdf8", r:[20,24]},{ name:"Angles", color:"#fb923c", r:[25,29]},{ name:"Central Tendency", color:"#4ade80", r:[30,34]},{ name:"Capacity", color:"#f472b6", r:[35,39]}];
+const Q = [
+  {q:"A train covers 480 km in 4 hours. What is its average speed?",o:["100 km/h","110 km/h","120 km/h","130 km/h"],a:2,e:"Speed = Distance ÷ Time = 480 ÷ 4 = 120 km/h"},
+  {q:"A car travels at 75 km/h. How long does it take to cover 337.5 km?",o:["3 h 30 min","4 h 30 min","4 h","5 h"],a:1,e:"Time = 337.5 ÷ 75 = 4.5 h = 4 h 30 min"},
+  {q:"A cyclist rides for 2 hours 15 minutes at 20 km/h. How far does she travel?",o:["40 km","42 km","45 km","50 km"],a:2,e:"2h15min = 2.25h; Distance = 20 × 2.25 = 45 km"},
+  {q:"A car travels 60 km in the first hour and 80 km in the second hour. What is the average speed over both hours?",o:["60 km/h","70 km/h","75 km/h","80 km/h"],a:1,e:"Total = 140 km, time=2h → average = 70 km/h"},
+  {q:"A sprinter runs 100 m in 12.5 seconds. What is his speed in km/h?",o:["28.8 km/h","30 km/h","32 km/h","36 km/h"],a:0,e:"Speed = 100/12.5 = 8 m/s; 8 × 3.6 = 28.8 km/h"},
+  {q:"A bag of flour weighs 2.75 kg. How many grams is that?",o:["275 g","2750 g","27500 g","27.5 g"],a:1,e:"1 kg = 1000g → 2.75 × 1000 = 2750 g"},
+  {q:"A lorry carries 7200 kg of gravel. What is this in tonnes?",o:["72 t","7.2 t","0.72 t","720 t"],a:1,e:"1 tonne = 1000 kg → 7200 ÷ 1000 = 7.2 t"},
+  {q:"Eight identical dictionaries have a total mass of 6.4 kg. What is the mass of three of them in grams?",o:["800 g","2400 g","1200 g","2000 g"],a:1,e:"One = 0.8 kg = 800 g; three = 2400 g"},
+  {q:"One box weighs 4 kg 350 g and another weighs 3 kg 870 g. What is the difference in their masses?",o:["480 g","380 g","570 g","460 g"],a:0,e:"4350 − 3870 = 480 g"},
+  {q:"A full water tank weighs 95 kg. When one-fifth full it weighs 31 kg. What is the weight of the empty tank?",o:["15 kg","11 kg","13 kg","9 kg"],a:0,e:"Water W: tank+W=95, tank+W/5=31 → 4W/5=64 → W=80; tank=15 kg"},
+  {q:"What is the volume of a sphere with radius 6 cm? (π≈3.14)",o:["904.32 cm³","452.16 cm³","300.72 cm³","750.50 cm³"],a:0,e:"V = (4/3)πr³ = (4/3)(3.14)(216) = 904.32 cm³"},
+  {q:"The volume of a sphere is 36π cm³. What is its radius?",o:["2 cm","3 cm","4 cm","6 cm"],a:1,e:"(4/3)πr³ = 36π → r³ = 27 → r=3 cm"},
+  {q:"Two spheres have radii in the ratio 1 : 2. What is the ratio of their volumes?",o:["1:2","1:4","1:6","1:8"],a:3,e:"Volume ∝ r³ → 1³:2³ = 1:8"},
+  {q:"A solid sphere of radius 3 cm is melted and recast into small spheres of radius 1 cm. How many small spheres?",o:["9","18","27","36"],a:2,e:"N = (3/1)³ = 27"},
+  {q:"A sphere has a volume of 523.33 cm³. What is its diameter? (π≈3.14)",o:["5 cm","8 cm","10 cm","12 cm"],a:2,e:"r³ = (523.33×3)/(4×3.14)=125 → r=5 → diam=10 cm"},
+  {q:"A cube has a side length of 7 cm. What is its volume?",o:["343 cm³","294 cm³","49 cm³","147 cm³"],a:0,e:"V = 7³ = 343 cm³"},
+  {q:"A cuboid measures 9 cm × 6 cm × 4 cm. What is its volume?",o:["180 cm³","216 cm³","240 cm³","260 cm³"],a:1,e:"V = 9×6×4 = 216 cm³"},
+  {q:"A rectangular tank is 50 cm × 40 cm × 30 cm. What is its volume in litres?",o:["6 L","60 L","600 L","6000 L"],a:1,e:"V = 60,000 cm³ = 60 L"},
+  {q:"The volume of a cube is 512 cm³. What is the length of one edge?",o:["6 cm","7 cm","8 cm","9 cm"],a:2,e:"s = ∛512 = 8 cm"},
+  {q:"A cuboid has volume 504 cm³, length 14 cm and width 6 cm. Find its height.",o:["5 cm","6 cm","7 cm","8 cm"],a:1,e:"h = 504 ÷ (14×6) = 6 cm"},
+  {q:"Convert 4.25 km to metres.",o:["425 m","4250 m","42500 m","42.5 m"],a:1,e:"4.25 × 1000 = 4250 m"},
+  {q:"A rope of 9.6 m is cut into 8 equal pieces. How long is each piece in cm?",o:["12 cm","120 cm","1.2 cm","96 cm"],a:1,e:"9.6÷8=1.2 m = 120 cm"},
+  {q:"How many millimetres are in 3.07 m?",o:["307 mm","3070 mm","30.7 mm","30700 mm"],a:1,e:"3.07 × 1000 = 3070 mm"},
+  {q:"The perimeter of a rectangle is 48 cm. Its length is 14 cm. What is its width?",o:["8 cm","10 cm","12 cm","20 cm"],a:1,e:"2(l+w)=48 → w=24−14=10 cm"},
+  {q:"A right-angled triangle has legs of 8 cm and 15 cm. What is the hypotenuse?",o:["16 cm","17 cm","18 cm","20 cm"],a:1,e:"√(64+225)=√289=17 cm"},
+  {q:"Two angles of a triangle are 48° and 73°. What is the third angle?",o:["49°","59°","69°","79°"],a:1,e:"180−48−73=59°"},
+  {q:"Sum of interior angles of an octagon?",o:["900°","1080°","1260°","1440°"],a:1,e:"(8−2)×180=1080°"},
+  {q:"Angle and its complement in ratio 1:4. Find larger angle.",o:["18°","54°","72°","80°"],a:2,e:"x+4x=90→x=18°, larger=72°"},
+  {q:"Two parallel lines cut by transversal: alternate interior angle 63°. Find the other.",o:["117°","63°","27°","90°"],a:1,e:"Alternate interior angles are equal: 63°"},
+  {q:"Each interior angle of regular polygon is 150°. How many sides?",o:["10","12","14","15"],a:1,e:"(n−2)×180/n=150 → n=12"},
+  {q:"Mean of 15,22,18,31,9,17",o:["17.0","18.7","19.0","20.0"],a:1,e:"Sum=112 → 112÷6≈18.7"},
+  {q:"Median: 3,11,7,2,15,8,5",o:["5","7","8","11"],a:1,e:"Ordered:2,3,5,7,8,11,15 → median=7"},
+  {q:"Mode of 6,8,6,4,9,6,8,4,8,6",o:["4","6","8","9"],a:1,e:"6 appears 4 times — most frequent"},
+  {q:"Mean of 6 numbers is 14. Five:12,18,10,16,11. What is sixth?",o:["13","17","15","11"],a:1,e:"Sum=84; sixth=84−(12+18+10+16+11)=17"},
+  {q:"Range: 45,52,38,61,45,70,55,38",o:["28","30","32","38"],a:2,e:"70−38=32"},
+  {q:"Convert 6750 mL to litres",o:["67.5 L","0.675 L","675 L","6.75 L"],a:3,e:"6750÷1000=6.75 L"},
+  {q:"Bucket 3.5 litres, how many 175 mL cups?",o:["15","18","20","24"],a:2,e:"3500÷175=20"},
+  {q:"Water tank holds 4,800,000 mL in kL",o:["4.8 kL","48 kL","480 kL","4800 kL"],a:0,e:"4,800,000 mL=4800 L=4.8 kL"},
+  {q:"Cuboid 40×25×30 cm capacity in litres",o:["3 L","30 L","300 L","3000 L"],a:1,e:"V=30,000 cm³=30 L"},
+  {q:"Medicine bottle 480 mL, dose 20mL three times daily. Days?",o:["6","7","8","9"],a:2,e:"Daily=60mL → 480÷60=8 days"}
+];
+const N = Q.length; const L = ["A","B","C","D"];
+let cur = 0;
+let ans = new Array(N).fill(null);
+
+function topicOf(i) { return TOPICS.find(t => i >= t.r[0] && i <= t.r[1]); }
+function countAns() { return ans.filter(a => a !== null).length; }
+
+/* —————— INSTANT EXPLANATION RENDER —————— */
+function showInstantExplanation(selectedIdx, topicColor) {
+  const qData = Q[cur];
+  const isCorrect = (selectedIdx === qData.a);
+  const panel = document.getElementById('instantExplainPanel');
+  const correctLetter = L[qData.a];
+  const correctText = qData.o[qData.a];
+  const explanation = qData.e;
+  const statusClass = isCorrect ? 'correct' : 'wrong';
+  const statusIcon = isCorrect ? '✓ Correct' : '✗ Incorrect';
+  const headerIcon = isCorrect ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>';
+  panel.style.display = 'block';
+  panel.className = `instant-explain ${statusClass}`;
+  panel.innerHTML = `
+    <div class="explain-header">${headerIcon} <span>${statusIcon}</span></div>
+    <div class="explain-text">${explanation}</div>
+    <div class="correct-answer-highlight">✨ Correct answer: ${correctLetter}. ${correctText}</div>
+  `;
+  // auto-scroll smoothly into view
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function clearInstantExplain() {
+  const panel = document.getElementById('instantExplainPanel');
+  panel.style.display = 'none';
+  panel.innerHTML = '';
+}
+
+/* pickAnswer enhanced: store answer + show explanation */
+function pickAnswer(idx) {
+  const qData = Q[cur];
+  ans[cur] = idx;
+  const topic = topicOf(cur);
+  const container = document.getElementById('optsContainer');
+  container.querySelectorAll('.opt').forEach((el, i) => {
+    el.className = 'opt' + (i === idx ? ' sel' : '');
+    if (i === idx) {
+      el.style.background = topic.color + '18';
+      el.style.borderColor = topic.color + '60';
+      const ltr = el.querySelector('.opt-ltr');
+      if (ltr) { ltr.style.background = `linear-gradient(135deg, ${topic.color}cc, ${topic.color})`; ltr.style.borderColor = 'transparent'; ltr.style.color = '#0d0a1e'; }
+    } else {
+      el.style.background = ''; el.style.borderColor = '';
+      const ltr = el.querySelector('.opt-ltr'); if(ltr) { ltr.style.cssText = ''; }
+    }
+  });
+  // show instant explanation panel after choosing
+  showInstantExplanation(idx, topic.color);
+  syncGrid();
+}
+
+function renderQuestion() {
+  clearInstantExplain();
+  const q = Q[cur];
+  const t = topicOf(cur);
+  document.getElementById('topicBanner').style.cssText = `color:${t.color};border-color:${t.color}55;background:${t.color}14`;
+  document.getElementById('topicBanner').innerHTML = `<span class="qtb-dot" style="background:${t.color}"></span>${t.name}`;
+  const badge = document.getElementById('qNumBadge');
+  badge.textContent = cur+1;
+  badge.style.cssText = `background:${t.color}22;color:${t.color};border:1px solid ${t.color}40`;
+  document.getElementById('qMetaNum').textContent = `Question ${cur+1} of ${N}`;
+  document.getElementById('qMetaTopic').textContent = t.name;
+  document.getElementById('qText').textContent = q.q;
+  const container = document.getElementById('optsContainer');
+  container.innerHTML = '';
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (ans[cur] === i ? ' sel' : '');
+    const ltrSpan = document.createElement('span'); ltrSpan.className = 'opt-ltr'; ltrSpan.textContent = L[i];
+    if (ans[cur] === i) {
+      ltrSpan.style.background = `linear-gradient(135deg, ${t.color}cc, ${t.color})`;
+      ltrSpan.style.borderColor = 'transparent'; ltrSpan.style.color = '#0d0a1e';
+      btn.style.background = t.color + '18'; btn.style.borderColor = t.color + '60';
+    }
+    btn.appendChild(ltrSpan); btn.appendChild(document.createTextNode(opt));
+    btn.onclick = (function(idx) { return () => pickAnswer(idx); })(i);
+    container.appendChild(btn);
+  });
+  // If current question already answered, show its stored explanation
+  if (ans[cur] !== null) {
+    showInstantExplanation(ans[cur], t.color);
+  }
+  const last = cur === N-1;
+  document.getElementById('btnPrev').disabled = (cur === 0);
+  document.getElementById('btnNext').style.display = last ? 'none' : 'inline-flex';
+  document.getElementById('btnSubmit').style.display = last ? 'inline-flex' : 'none';
+  syncGrid();
+  document.getElementById('quizMain').scrollTop = 0;
+}
+
+function navigate(d) { cur = Math.min(N-1, Math.max(0, cur + d)); renderQuestion(); }
+function buildGrid() { const g=document.getElementById('qGrid'); g.innerHTML=''; for(let i=0;i<N;i++){ let b=document.createElement('button'); b.id='gb'+i; b.className='qnbtn'; b.textContent=i+1; b.onclick=(idx=>()=>{cur=idx; renderQuestion();})(i); g.appendChild(b);} syncGrid();}
+function syncGrid(){ for(let i=0;i<N;i++){ let b=document.getElementById('gb'+i); if(b) b.className='qnbtn'+(i===cur?' qn-cur':'')+(ans[i]!==null?' qn-done':'');} let a=countAns(); document.getElementById('sbCount').textContent=a+'/40'; document.getElementById('tbPill').textContent='Answered: '+a+' / 40'; document.getElementById('progLabel').textContent='Q'+(cur+1)+' of 40'; document.getElementById('progFill').style.width=((cur+1)/N*100)+'%';}
+function startQuiz(){ document.getElementById('cover').style.display='none'; document.getElementById('quiz').style.display='flex'; buildGrid(); renderQuestion(); }
+function submitQuiz(){ document.getElementById('quiz').style.display='none'; document.getElementById('result').style.display='block'; buildResult(); }
+function buildResult(){ let correct=0,wrong=0,skipped=0; ans.forEach((a,i)=>{ if(a===null) skipped++; else if(a===Q[i].a) correct++; else wrong++; }); const pct=Math.round(correct/N*100); document.getElementById('resScore').textContent=correct; document.getElementById('rsC').textContent=correct; document.getElementById('rsW').textContent=wrong; document.getElementById('rsS').textContent=skipped; document.getElementById('rsP').textContent=pct+'%'; let icon,title,gText,gColor; if(pct>=90){icon='🏆';title='Outstanding!';gText='Distinction';gColor='#fbbf24';} else if(pct>=75){icon='🥇';title='Excellent!';gText='Merit';gColor='#34d399';} else if(pct>=60){icon='🥈';title='Well Done!';gText='Credit';gColor='#38bdf8';} else if(pct>=45){icon='🎖️';title='Good Effort!';gText='Pass';gColor='#4ade80';} else if(pct>=30){icon='📘';title='Keep Practising';gText='Below Avg';gColor='#fb923c';} else{icon='📚';title='Needs Revision';gText='Fail';gColor='#f87171';} document.getElementById('resIcon').textContent=icon; document.getElementById('resTitle').textContent=title; let rg=document.getElementById('resGrade'); rg.textContent=gText; rg.style.color=gColor; rg.style.borderColor=gColor; rg.style.background=`${gColor}20`; const breakdown=document.getElementById('topicBreakdown'); breakdown.innerHTML=''; TOPICS.forEach(t=>{ let sc=0,tot=t.r[1]-t.r[0]+1; for(let i=t.r[0];i<=t.r[1];i++) if(ans[i]===Q[i].a) sc++; let pctb=Math.round(sc/tot*100); let row=document.createElement('div'); row.className='tbar-row'; row.innerHTML=`<div class="tbar-lbl">${t.name}</div><div class="tbar-track"><div class="tbar-fill" style="width:0%;background:${t.color}" data-w="${pctb}"></div></div><div class="tbar-score" style="color:${t.color}">${sc}/${tot}</div>`; breakdown.appendChild(row); }); requestAnimationFrame(()=>{ document.querySelectorAll('.tbar-fill').forEach(el=>{ el.style.width=el.dataset.w+'%'; }); }); let tbody=document.getElementById('sheetTbody'); tbody.innerHTML=''; Q.forEach((q,i)=>{ let ua=ans[i]; let t=topicOf(i); let badgeCell, ansCell; if(ua===null){ badgeCell='<span class="badge b-sk">— Skipped</span>'; ansCell=`<span style="color:rgba(240,238,255,.25)">No answer</span><div class="ans-sub"><span class="ans-correct">✓ ${L[q.a]}. ${q.o[q.a]}</span></div>`; } else if(ua===q.a){ badgeCell='<span class="badge b-ok">✔ Correct</span>'; ansCell=`${L[ua]}. ${q.o[ua]}`; } else{ badgeCell='<span class="badge b-ng">✘ Wrong</span>'; ansCell=`${L[ua]}. ${q.o[ua]}<div class="ans-sub"><span class="ans-correct">✓ ${L[q.a]}. ${q.o[q.a]}</span></div><div class="ans-sub"><span class="ans-exp">${q.e}</span></div>`; } tbody.innerHTML+=`<tr class="${ua===null?'':(ua===q.a?'tr-ok':'tr-ng')}"><td>${i+1}</td><td style="color:${t.color};font-size:11px;font-weight:600;">${t.name}</td><td style="max-width:260px;font-size:12px">${q.q}</td><td>${ansCell}</td><td>${badgeCell}</td></tr>`; }); }
+function retryQuiz(){ cur=0; ans=new Array(N).fill(null); document.getElementById('result').style.display='none'; document.getElementById('quiz').style.display='flex'; buildGrid(); renderQuestion(); window.scrollTo(0,0); }
+
+// canvas & symbols initialization omitted for brevity but added via existing scripts
+(function(){ const canvas=document.getElementById('bg-canvas'); const ctx=canvas.getContext('2d'); let W,H,t=0; const orbs=[{x:.15,y:.25,r:.45,hue:260,sat:80,speed:.0003,phase:0},{x:.85,y:.70,r:.40,hue:195,sat:75,speed:.0004,phase:1.2},{x:.50,y:.10,r:.35,hue:300,sat:70,speed:.0005,phase:2.4},{x:.25,y:.80,r:.30,hue:160,sat:65,speed:.00035,phase:0.8},{x:.75,y:.40,r:.38,hue:220,sat:72,speed:.00045,phase:3.1},{x:.60,y:.90,r:.28,hue:40,sat:85,speed:.0006,phase:1.7}]; function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;} window.addEventListener('resize',resize); resize(); function fullDraw(){ t+=1; ctx.clearRect(0,0,W,H); const bg=ctx.createLinearGradient(0,0,W,H); bg.addColorStop(0,'#050810'); bg.addColorStop(.4,'#0a0719'); bg.addColorStop(.7,'#080d1f'); bg.addColorStop(1,'#050810'); ctx.fillStyle=bg; ctx.fillRect(0,0,W,H); orbs.forEach(o=>{ const cx=W*(o.x+.08*Math.sin(t*o.speed*3.7+o.phase)); const cy=H*(o.y+.06*Math.cos(t*o.speed*2.9+o.phase)); const r=Math.min(W,H)*(o.r+.04*Math.sin(t*o.speed*5+o.phase)); const alpha=.12+.05*Math.sin(t*o.speed*4+o.phase); const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r); g.addColorStop(0,`hsla(${o.hue},${o.sat}%,62%,${alpha})`); g.addColorStop(.5,`hsla(${o.hue+20},${o.sat}%,48%,${alpha*.45})`); g.addColorStop(1,`hsla(${o.hue+40},${o.sat}%,30%,0)`); ctx.save(); ctx.globalCompositeOperation='screen'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill(); ctx.restore(); }); const stars=[]; for(let i=0;i<160;i++) stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.1,a:.1+Math.random()*.5}); stars.forEach(s=>{ ctx.beginPath(); ctx.arc(s.x*W,s.y*H,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(255,255,255,${s.a})`; ctx.fill(); }); requestAnimationFrame(fullDraw); } fullDraw(); })(); (function(){ const sym=['π','∑','∫','√','∞','≈','÷','×','∠','⊙','△','≠','≡','∈','⊂','∏','∀','∃','∇','⊕']; const cont=document.getElementById('mathSymbols'); for(let i=0;i<18;i++){ const el=document.createElement('div'); el.className='math-symbol'; el.textContent=sym[i%sym.length]; const size=24+Math.random()*64; el.style.cssText=`left:${Math.random()*100}vw;font-size:${size}px;animation-duration:${18+Math.random()*22}s;animation-delay:${-Math.random()*20}s;`; cont.appendChild(el); } })();
+</script>
+</body>
+</html>
